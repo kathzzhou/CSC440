@@ -1,0 +1,33 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class Fire {
+
+    private static final Random random = new Random();
+
+    private final Ship ship;
+    private final double q;
+    private final List<int[]> burningCells;
+
+    public Fire(Ship ship, double q) {
+        this.ship = ship;
+        this.q = q;
+        this.burningCells = new ArrayList<>();
+    }
+
+    public void startFire() {
+        List<int[]> openCells = new ArrayList<>();
+        for (int i = 0; i < ship.getSize(); i++) {
+            for (int j = 0; j < ship.getSize(); j++) {
+                if (ship.isOpenCell(i, j)) {
+                    openCells.add(new int[]{i, j});
+                }
+            }
+        }
+        int[] initialFirePosition = openCells.get(random.nextInt(openCells.size()));
+        ship.setBurning(initialFirePosition[0], initialFirePosition[1]);
+        burningCells.add(initialFirePosition);
+    }
+
+}
