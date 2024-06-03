@@ -134,7 +134,7 @@ public class Ship{
                 openCell(chosenCell[0], chosenCell[1]);
 
                 // Update blockedCells list
-                newBlockedCells = getBlockedCellsWOneOpenNeighor();
+                List<int[]> newBlockedCells = getBlockedCellsWOneOpenNeighor();
                 blockedCells.removeAll(blockedCells)
                 blockedCells.addAll(newBlockedCells)
             }
