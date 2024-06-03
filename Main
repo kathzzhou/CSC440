@@ -24,6 +24,9 @@ public class Main {
         Fire fire = new Fire(ship, q);
         fire.startFire();
 
+        // Initialize ButtonCell
+        
+
         for(int i = 0; i < 10; i++){
             bot.moveBot();
             System.out.println("Bot position after move " + (i + 1) + ": (" + bot.getX() + ", " + bot.getY() + ")");
