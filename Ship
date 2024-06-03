@@ -132,6 +132,11 @@ public class Ship{
             else{
                 int[] chosenCell = blockedCells.get(random.nextInt(blockedCells.size()));
                 openCell(chosenCell[0], chosenCell[1]);
+
+                // Update blockedCells list
+                newBlockedCells = getBlockedCellsWOneOpenNeighor();
+                blockedCells.removeAll(blockedCells)
+                blockedCells.addAll(newBlockedCells)
             }
         }
         
