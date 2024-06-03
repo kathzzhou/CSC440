@@ -135,8 +135,8 @@ public class Ship{
 
                 // Update blockedCells list
                 List<int[]> newBlockedCells = getBlockedCellsWOneOpenNeighor();
-                blockedCells.removeAll(blockedCells)
-                blockedCells.addAll(newBlockedCells)
+                blockedCells.removeAll(blockedCells);
+                blockedCells.addAll(newBlockedCells);
             }
         }
         
