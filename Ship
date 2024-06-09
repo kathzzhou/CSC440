@@ -1,3 +1,4 @@
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,7 +15,7 @@ public class Ship{
         this.size = size;
         this.grid = new String[size][size];
         createGrid();
-    }
+        }
 
     // Creating a D x D grid of blocked cells 
     private void createGrid(){
@@ -149,23 +150,20 @@ public class Ship{
         }
     }
 
-    // Prints grid
-    public void printGrid(){
-        for(String[] row : grid){
-            for(String cell : row){
-                System.out.println(cell.equals("open") ? "O " : "X ");
-            }
-            System.out.println();
-        }
-    }
-
-    // Prints grid including bot
-    public void printGridWithBot(Bot bot) {
+    // Prints grid including bot, fire, and button
+    public void printCompleteGrid(Bot bot, Fire fire, Button button) {
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
                 if (bot.getX() == x && bot.getY() == y) {
                     System.out.print("B ");
-                } else {
+                }
+                else if(fire.isBurning(x,y)){
+                    System.out.print("F ");
+                }
+                else if((button.getXButtonLoc() == x) && (button.getYButtonLoc() == y)){
+                    System.out.print("b ");
+                }
+                else {
                     System.out.print(grid[x][y].equals("open") ? "O " : "X ");
                 }
             }
@@ -187,8 +185,25 @@ public class Ship{
     }
 
     // Checks if cell is burning -- returns boolean
-    public boolean isBurning(int x, int y) {
-        return grid[x][y].equals("burning");
+    // public boolean isBurning(int x, int y) {
+    //     return grid[x][y].equals("burning");
+    // }
+
+    public List<int[]> getOpenCells(){
+        List<int[]> openCells = new ArrayList<>();
+
+        for (int i = 0; i < getSize(); i++) {
+            for (int j = 0; j < getSize(); j++) {
+                if (isOpenCell(i, j)) {
+                    openCells.add(new int[]{i, j});
+                }
+            }
+        }
+        return openCells;
+    }
+
+    public String[][] getGrid(){
+        return grid;
     }
 
 }
