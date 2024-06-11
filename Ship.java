@@ -10,12 +10,35 @@ public class Ship{
     private static final Random random = new Random();
     private final String[][] grid;
     private final int size;
+    private Cell button;
 
     public Ship(int size){
         this.size = size;
         this.grid = new String[size][size];
         createGrid();
+        startShip();
+        button = createButton();
+    }
+
+    public Cell createButton(){
+        // Initialize Button
+        Cell button = null;
+        while(true){
+            int x = random.nextInt(getSize() - 1);
+            int y = random.nextInt(getSize() - 1);
+
+            if(isOpenCell(x,y) && (!isBurning(x,y))){
+                button = new Cell(x,y);
+                break;
+            }
         }
+        return button;
+    }
+
+    // Button Getter
+    public Cell getButton(){
+        return button;
+    }
 
     // Creating a D x D grid of blocked cells 
     private void createGrid(){
@@ -27,19 +50,22 @@ public class Ship{
     }
 
     // Retrieving neighbors of cell as adjacent cells in up/down/left/right direction
-    public List<int[]> getNeighbors(int x, int y){
-        List<int[]> neighbors = new ArrayList<>();
+    public List<Cell> getNeighbors(Cell cell){
+        List<Cell> neighbors = new ArrayList<>();
+        int x = cell.getX();
+        int y = cell.getY();
+
         if(x > 0){
-            neighbors.add(new int[]{x-1,y});
+            neighbors.add(new Cell(x-1,y));
         }
         if(x < size-1){
-            neighbors.add(new int[]{x+1,y});
+            neighbors.add(new Cell(x+1,y));
         }
         if(y > 0){
-            neighbors.add(new int[]{x,y-1});
+            neighbors.add(new Cell(x,y-1));
         }
         if(y < size-1){
-            neighbors.add(new int[]{x, y+1});
+            neighbors.add(new Cell(x, y+1));
         }
         return neighbors;
     }
@@ -52,11 +78,11 @@ public class Ship{
     }
 
     // Boolean if cell has one open neighbor
-    private boolean hasOneOpenNeighbor(int x, int y){
-        List<int[]> neighbors = getNeighbors(x, y);
+    private boolean hasOneOpenNeighbor(Cell cell){
+        List<Cell> neighbors = getNeighbors(cell);
         int openNeighbors = 0;
-        for(int[] neighbor : neighbors){
-            if(grid[neighbor[0]][neighbor[1]].equals("open")){
+        for(Cell neighbor : neighbors){
+            if(grid[neighbor.getX()][neighbor.getY()].equals("open")){
                 openNeighbors++;
             }
         }
@@ -64,12 +90,13 @@ public class Ship{
     }
 
     // Return list of blocked cells with one open neighbor
-    private List<int[]> getBlockedCellsWOneOpenNeighbor(){
-        List <int[]> blockedCells = new ArrayList<>();
+    private List<Cell> getBlockedCellsWOneOpenNeighbor(){
+        List <Cell> blockedCells = new ArrayList<>();
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
-                if(grid[x][y].equals("blocked") && hasOneOpenNeighbor(x, y)){
-                    blockedCells.add(new int[]{x, y});
+                Cell cell = new Cell(x,y);
+                if(grid[x][y].equals("blocked") && hasOneOpenNeighbor(cell)){
+                    blockedCells.add(new Cell(x, y));
                 }
             }
         }
@@ -82,12 +109,13 @@ public class Ship{
     }
 
     // Return all dead ends
-    private List<int[]> identifyDeadEnds(){
-        List<int[]> deadEnds = new ArrayList<>();
+    private List<Cell> identifyDeadEnds(){
+        List<Cell> deadEnds = new ArrayList<>();
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
-                if(grid[x][y].equals("open") && hasOneOpenNeighbor(x, y)){
-                    deadEnds.add(new int[]{x,y});
+                Cell cell = new Cell(x,y);
+                if(grid[x][y].equals("open") && hasOneOpenNeighbor(cell)){
+                    deadEnds.add(new Cell(x,y));
                 }
             }
         }
@@ -95,17 +123,17 @@ public class Ship{
     }
 
     // Open closed neighbor of a dead end at random
-    private void openRandomNeighborOfDeadEnd(int x, int y){
-        List<int[]> neighbors = getNeighbors(x, y);
-        List<int[]> closedNeighbors = new ArrayList<>();
-        for(int[] neighbor : neighbors){
-            if(grid[neighbor[0]][neighbor[1]].equals("blocked")){
+    private void openRandomNeighborOfDeadEnd(Cell cell){
+        List<Cell> neighbors = getNeighbors(cell);
+        List<Cell> closedNeighbors = new ArrayList<>();
+        for(Cell neighbor : neighbors){
+            if(grid[cell.getX()][cell.getY()].equals("blocked")){
                 closedNeighbors.add(neighbor);
             }
         }
         if(!closedNeighbors.isEmpty()){
-            int[] chosenNeighbor = closedNeighbors.get(random.nextInt(closedNeighbors.size()));
-            openCell(chosenNeighbor[0], chosenNeighbor[1]);
+            Cell chosenNeighbor = closedNeighbors.get(random.nextInt(closedNeighbors.size()));
+            openCell(chosenNeighbor.getX(), chosenNeighbor.getY());
         }
     }
 
@@ -126,42 +154,44 @@ public class Ship{
 
         // Iterates and opens all blocked cells that have exactly one neighbor until none left
         while(true){
-            List<int[]> blockedCells = getBlockedCellsWOneOpenNeighbor();
+            List<Cell> blockedCells = getBlockedCellsWOneOpenNeighbor();
             if(blockedCells.isEmpty()){
                 break;
             }
             else{
-                int[] chosenCell = blockedCells.get(random.nextInt(blockedCells.size()));
-                openCell(chosenCell[0], chosenCell[1]);
+                Cell chosenCell = blockedCells.get(random.nextInt(blockedCells.size()));
+                openCell(chosenCell.getX(), chosenCell.getY());
 
                 // Update blockedCells list
-                List<int[]> newBlockedCells = getBlockedCellsWOneOpenNeighbor();
+                List<Cell> newBlockedCells = getBlockedCellsWOneOpenNeighbor();
                 blockedCells.removeAll(blockedCells);
                 blockedCells.addAll(newBlockedCells);
             }
         }
         
         // Takes half of set of dead ends and opens one of closed neighbors at random
-        List<int[]> deadEnds = identifyDeadEnds();
+        List<Cell> deadEnds = identifyDeadEnds();
         Collections.shuffle(deadEnds);
         for(int i = 0; i< deadEnds.size() / 2; i++){
-            int[] deadEnd = deadEnds.get(i);
-            openRandomNeighborOfDeadEnd(deadEnd[0], deadEnd[1]);
+            Cell deadEnd = deadEnds.get(i);
+            openRandomNeighborOfDeadEnd(deadEnd);
         }
     }
 
     // Prints grid including bot, fire, and button
-    public void printCompleteGrid(Bot bot, Fire fire, Button button) {
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[0].length; y++) {
+    public void printCompleteGrid(Cell bot, Fire fire) {
+        System.out.println("X- 0 1 2 3 4 5 6");
+        for (int y = 0; y < grid.length; y++) {
+            System.out.print(y + "- ");
+            for (int x = 0; x < grid[0].length; x++) {   
                 if (bot.getX() == x && bot.getY() == y) {
                     System.out.print("B ");
                 }
-                else if(fire.isBurning(x,y)){
+                else if(isBurning(x,y)){
                     System.out.print("F ");
                 }
-                else if((button.getXButtonLoc() == x) && (button.getYButtonLoc() == y)){
-                    System.out.print("b ");
+                else if((button.getX() == x) && (button.getY() == y)){
+                    System.out.print("s ");
                 }
                 else {
                     System.out.print(grid[x][y].equals("open") ? "O " : "X ");
@@ -189,13 +219,13 @@ public class Ship{
     //     return grid[x][y].equals("burning");
     // }
 
-    public List<int[]> getOpenCells(){
-        List<int[]> openCells = new ArrayList<>();
+    public List<Cell> getOpenCells(){
+        List<Cell> openCells = new ArrayList<>();
 
         for (int i = 0; i < getSize(); i++) {
             for (int j = 0; j < getSize(); j++) {
                 if (isOpenCell(i, j)) {
-                    openCells.add(new int[]{i, j});
+                    openCells.add(new Cell(i, j));
                 }
             }
         }
@@ -204,6 +234,70 @@ public class Ship{
 
     public String[][] getGrid(){
         return grid;
+    }
+
+    public void setCellOnFire(){
+        while(true){
+            int x = random.nextInt(getSize()-1);
+            int y = random.nextInt(getSize()-1);
+            if(isOpenCell(x,y)){
+                grid[x][y] = "burning";
+                System.out.println("Starting Fire Cell: "+ x + ", " + y);
+                break;
+            }
+        }
+    }
+
+    // Returns a List of all openNeighbors given a position in the grid
+    public List<Cell> getOpenNeighbors(Cell cell){
+        List<Cell> openNeighbors = new ArrayList<>();
+        int x = cell.getX();
+        int y = cell.getY();
+
+        if(isOpenCell(x-1,y)){
+            openNeighbors.add(new Cell(x-1,y));
+        }
+        if(isOpenCell(x+1,y)){
+            openNeighbors.add(new Cell(x+1,y));
+        }
+        if(isOpenCell(x,y-1)){
+            openNeighbors.add(new Cell(x,y-1));
+        }
+        if(isOpenCell(x,y+1)){
+            openNeighbors.add(new Cell(x,y+1));
+        }
+
+        return openNeighbors;
+    }
+
+    public boolean isBurning(int x, int y){
+        return getGrid()[x][y].equals("burning");
+    }
+
+    // Returns the number of burningCells neighboring a given cell
+    public int numOfBurningCells(Cell cell){
+        int x = cell.getX();
+        int y = cell.getY();
+        
+        int burningCount = 0;
+        if(isBurning(x-1,y) || isBurning(x+1,y) || 
+            isBurning(x,y-1) || isBurning(x,y+1)){
+            burningCount++;
+        }
+        return burningCount;
+    }
+
+    public List<Cell> getBurningCells(){
+        List<Cell> burningCells = new ArrayList<>();
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                if(isBurning(x,y)){
+                    burningCells.add(new Cell(x,y));
+                }
+            }
+        }
+        return burningCells;
     }
 
 }
