@@ -8,40 +8,69 @@ public class Bot{
 
     private int x; 
     private int y;
-    private final Ship ship;
+    protected final Ship ship;
 
     public Bot(Ship ship){
         this.ship = ship;
     }
 
-    public void placeBot(){
-        List<int[]> openCells = new ArrayList<>();
+    public Cell placeBot(){
+        List<Cell> openCells = new ArrayList<>();
         for(int i = 0; i < ship.getSize(); i++){
             for(int j = 0; j < ship.getSize(); j++){
-                if(ship.isOpenCell(i,j)){
-                    openCells.add(new int[]{i,j});
+                if(!(ship.getButton() == new Cell(i,j))){
+                    if(ship.isOpenCell(i,j)){
+                        openCells.add(new Cell(i,j));
+                    }
                 }
             }
         }
-        int[] initialPosition = openCells.get(random.nextInt(openCells.size()));
-        this.x = initialPosition[0];
-        this.y = initialPosition[1];
+        Cell initialPosition = openCells.get(random.nextInt(openCells.size()));
+        this.x = initialPosition.getX();
+        this.y = initialPosition.getY();
+        return initialPosition;
     }
 
     public void moveBot(){
-        List<int[]> neighbors = ship.getNeighbors(x, y);
-        List<int[]> openNeighbors = new ArrayList<>();
+        Cell cell = new Cell(getX(), getY());
+        List<Cell> neighbors = ship.getNeighbors(cell);
+        List<Cell> openNeighbors = new ArrayList<>();
 
-        for(int[] neighbor : neighbors){
-            if(ship.isOpenCell(neighbor[0], neighbor[1])){
+        for(Cell neighbor : neighbors){
+            if(ship.isOpenCell(neighbor.getX(), neighbor.getY())){
                 openNeighbors.add(neighbor);
             }
         }
         if(!openNeighbors.isEmpty()){
-            int[] newPosition = openNeighbors.get(random.nextInt(openNeighbors.size()));
-            this.x = newPosition[0];
-            this.y = newPosition[1];
+            Cell newPosition = openNeighbors.get(random.nextInt(openNeighbors.size()));
+            this.x = newPosition.getX();
+            this.y = newPosition.getY();
         }
+    }
+
+    public List<Cell> getBotNeighbors(Cell cell){
+        List<Cell> neighbors = new ArrayList<>();
+        int x = cell.getX();
+        int y = cell.getY();
+
+        if ((x > 0) && (ship.isOpenCell(x - 1, y))){
+            neighbors.add(new Cell(x - 1, y));
+        } 
+        if ((x < ship.getSize() - 1) && (ship.isOpenCell(x + 1, y))){
+            neighbors.add(new Cell(x + 1, y));
+        }
+        if ((y > 0) && (ship.isOpenCell(x, y - 1))){
+            neighbors.add(new Cell(x, y - 1));
+        }
+        if ((y < ship.getSize() - 1) && (ship.isOpenCell(x, y + 1))){
+            neighbors.add(new Cell(x, y + 1));
+        }
+        System.out.print("("+ cell.toString() + ") neighbors are ");
+        for (Cell neighCell : neighbors) {
+            System.out.print("("+ neighCell.toString() + ")");    
+        }
+        System.out.println();
+        return neighbors;
     }
 
     public int getX(){
