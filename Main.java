@@ -11,70 +11,154 @@ public class Main {
     Scanner myObj = new Scanner(System.in);
 
     public static void main(String[] args) {
-        int D = 5; 
-        String menuOption = "1";
-        // String [][] fixedGrid = {
-        //     {"blocked", "open", "open", "blocked", "open"},
-        //     {"blocked", "open", "blocked", "open", "open"},
-        //     {"blocked", "open", "open", "open", "blocked"},
-        //     {"open", "blocked", "blocked", "open", "open"},
-        //     {"open", "open", "open", "open", "blocked"}
-        // };
-        // Cell button = new Cell(1,0);
-        // Cell bot = new Cell(1,3);
-
+        int D = 10; 
+        String menuOption = "2";
+        
         //menuOption = printMenu();
 
         while(true){
             if(menuOption.equals("1")){ // Bot 1
-                // Initialize Ship
+                
                 Ship ship = new Ship(D);
-                //Ship ship = new Ship(fixedGrid, bot, button);
-                //ship.startShip();
                 Bot_1 bot_1 = new Bot_1(ship);
                 Cell botLocation = bot_1.placeBot();
-                ship.setCellOnFire(botLocation);
-                //Fire fire = new Fire(ship); <- old line where Fire class was in use
+                ship.setFirstCellOnFire(botLocation);
                 ship.setBot(botLocation.getX(), botLocation.getY());
-                ship.printCompleteGrid();
-                        
-                
-                List<Cell> shortestPath = (bot_1.breadthFirstSearch(ship));
-                
-                // System.out.println(shortestPath.size());
-                // for(int i = 0; i < shortestPath.size(); i++){
-                //     Cell cell = shortestPath.get(i);
-                // System.out.println(cell.toString());
-                // }
+                //ship.printCompleteGrid();
+                                        
+                while(true){
+                    System.out.println("======================================================");
+                    
+                    System.out.println("Bot Location: " + botLocation.toString());
+                    ship.setBot(botLocation.getX(), botLocation.getY());
+                    ship.printCompleteGrid();
+                    List<Cell> shortestPath = (bot_1.breadthFirstSearch(ship));
+                    if (shortestPath.size() > 0) {
+                        System.out.print("ShortestPath(size:" + shortestPath.size() +  "): ");
+                        for (Cell cell : shortestPath) {
+                            System.out.print(cell.toString() + " -> ");
+                        }
+                        System.out.println();
 
-                // //fire.startFire(ship);
-
-                // for(int i = 0; i < 10; i++){
-
-                //     //bot_1.breadthFirstSearch(botCell, buttonCell, fireCell);
-                //     bot.moveBot();
-                //     System.out.println("Bot position after move " + (i + 1) + ": (" + bot.getX() + ", " + bot.getY() + ")");
-                //     ship.printCompleteGrid(botCell, fire);
-                //     if((bot.getX() == ship.getButton().getX()) && (bot.getY() == ship.getButton().getY())){
-                //         //fire.endFire();
-                //         System.out.println("The bot has successfully found the button.\nThe fire has been extinguished.");
-                //         break;
-                //     }
-                // }  
+                        botLocation.setLocation(shortestPath.get(0).getX(), 
+                                                shortestPath.get(0).getY());
+                    }
+                    else if (shortestPath.size() == 0){
+                        System.out.println("There is no path from the bot to the button");
+                        break;                    
+                    }
+                    else {
+                        System.out.println("Bot reached the button (1).");
+                        break;                    
+                    }
+                    if(botLocation.getX() == ship.getButton().getX() && botLocation.getY() == ship.getButton().getY()){
+                        System.out.println("Bot reached the button (2).");
+                        break;
+                    }
+                    // Check if bot is on a cell with Fire
+                    if (ship.isBurning(botLocation.getX(), botLocation.getY())) {
+                        System.out.println("Bot is on the same cell as fire. Program Ends.");
+                        break;      
+                    }
+                }
                 break;
             }
             
 
-            if(menuOption.equals(String.valueOf(2))){ //Bot 2
+            if(menuOption.equals("2")){ //Bot 2
                 Ship ship = new Ship(D);
                 Bot_2 bot_2 = new Bot_2(ship);
                 Cell botLocation = bot_2.placeBot();
-                ship.setCellOnFire(botLocation);
+                ship.setFirstCellOnFire(botLocation);
                 ship.setBot(botLocation.getX(), botLocation.getY());
-                ship.printCompleteGrid();
-                        
-                
-                List<Cell> shortestPath = (bot_2.breadthFirstSearch(ship));
+
+                while((!ship.isBurning(botLocation.getX(), botLocation.getY()))){
+                    System.out.println("======================================================");
+                    
+                    System.out.println("Bot Location: " + botLocation.toString());
+                    ship.setBot(botLocation.getX(), botLocation.getY());
+                    ship.printCompleteGrid();
+                    List<Cell> shortestPath = (bot_2.breadthFirstSearch(ship));
+                    if (shortestPath.size() > 0) {
+                        System.out.print("ShortestPath(size:" + shortestPath.size() +  "): ");
+                        for (Cell cell : shortestPath) {
+                            System.out.print(cell.toString() + " -> ");
+                        }
+                        System.out.println();
+
+                        botLocation.setLocation(shortestPath.get(0).getX(), 
+                                                shortestPath.get(0).getY());
+                    }
+                    else if (shortestPath.size() == 0){
+                        System.out.println("There is no path from the bot to the button");
+                        break;                    
+                    }
+                    else {
+                        System.out.println("Bot reached the button (1).");
+                        break;                    
+                    }
+                    if(botLocation.getX() == ship.getButton().getX() && botLocation.getY() == ship.getButton().getY()){
+                        System.out.println("Bot reached the button (2).");
+                        break;
+                    }
+                    else{
+                        ship.spreadFire();
+                    }
+                    // Check if bot is on a cell with Fire
+                    if (ship.isBurning(botLocation.getX(), botLocation.getY())) {
+                        System.out.println("Bot is on the same cell as fire. Program Ends.");
+                        break;      
+                    }
+                }
+                break;
+            }
+
+            if(menuOption.equals("3")){ //Bot 3
+                Ship ship = new Ship(D);
+                Bot_3 bot_3 = new Bot_3(ship);
+                Cell botLocation = bot_3.placeBot();
+                ship.setFirstCellOnFire(botLocation);
+                ship.setBot(botLocation.getX(), botLocation.getY());
+
+                while((!ship.isBurning(botLocation.getX(), botLocation.getY()))){
+                    System.out.println("======================================================");
+                    
+                    System.out.println("Bot Location: " + botLocation.toString());
+                    ship.setBot(botLocation.getX(), botLocation.getY());
+                    ship.printCompleteGrid();
+                    List<Cell> shortestPath = (bot_3.breadthFirstSearch(ship));
+                    if (shortestPath.size() > 0) {
+                        System.out.print("ShortestPath(size:" + shortestPath.size() +  "): ");
+                        for (Cell cell : shortestPath) {
+                            System.out.print(cell.toString() + " -> ");
+                        }
+                        System.out.println();
+
+                        botLocation.setLocation(shortestPath.get(0).getX(), 
+                                                shortestPath.get(0).getY());
+                    }
+                    else if (shortestPath.size() == 0){
+                        System.out.println("There is no path from the bot to the button");
+                        break;                    
+                    }
+                    else {
+                        System.out.println("Bot reached the button (1).");
+                        break;                    
+                    }
+                    if(botLocation.getX() == ship.getButton().getX() && botLocation.getY() == ship.getButton().getY()){
+                        System.out.println("Bot reached the button (2).");
+                        break;
+                    }
+                    else{
+                        ship.spreadFire();
+                    }
+                    // Check if bot is on a cell with Fire
+                    if (ship.isBurning(botLocation.getX(), botLocation.getY())) {
+                        System.out.println("Bot is on the same cell as fire. Program Ends.");
+                        break;      
+                    }
+                }
+                break;
             }
 
             // if(menuOption.equals(String.valueOf(4))){
