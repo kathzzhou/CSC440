@@ -45,7 +45,7 @@ public class Bot_1 extends Bot{
             // Assign current node & Moves to next cell in queue
             previous = current;
             current = queue.poll();
-            System.out.println("LOOP Current : " + current.toString());
+            //System.out.println("LOOP Current : " + current.toString());
 
             // Check if bot = button
             if(current.equals(button)){
@@ -57,21 +57,16 @@ public class Bot_1 extends Bot{
                 }
                 else {
                     while(node.getParentCell() != null){
-                        System.out.print("Path NODE: " + node);   
                         path.add(node);
                         node = node.getParentCell();
-                        System.out.println("; After Path NODE: " + node);           
                     }
                     Collections.reverse(path);
                     return path;
                 }
             }
             //Add children of bot to queue
-            // neighbor p
-            // current parent
             else{
                 for(Cell neighbor : getBotNeighbors(current)){
-                    //System.out.println(neighbor);
                     if((!(ship.isBurning(neighbor.getX(),neighbor.getY()))) && 
                         (neighbor.isOpenCell(ship)) && 
                         visited[neighbor.getX()][neighbor.getY()] == false){
@@ -79,15 +74,12 @@ public class Bot_1 extends Bot{
                         if (dist < neighbor.getDist()) {
                             visited[neighbor.getX()][neighbor.getY()] = true;
                             cells[neighbor.getX()][neighbor.getY()].setDist(dist);
-                            System.out.println("Setting parent of (" + neighbor.getX() + "," + neighbor.getY() + 
-                                                                ") to (" + current.getX() + "," + current.getY() + ")");
                             cells[neighbor.getX()][neighbor.getY()].setParentCell(cells[current.getX()][current.getY()]);
                             queue.add(cells[neighbor.getX()][neighbor.getY()]);
                         }
                     }
                 }
             }
-            System.out.println();
         }
         System.out.println("No path exists between bot and button.");
         return new ArrayList<>();
