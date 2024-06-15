@@ -18,7 +18,7 @@ public class Bot{
         List<Cell> openCells = new ArrayList<>();
         for(int i = 0; i < ship.getSize(); i++){
             for(int j = 0; j < ship.getSize(); j++){
-                if(!(ship.getButton() == new Cell(i,j))){
+                if(i != ship.getButton().getX() && j != ship.getButton().getY()){
                     if(ship.isOpenCell(i,j)){
                         openCells.add(new Cell(i,j));
                     }
@@ -26,8 +26,6 @@ public class Bot{
             }
         }
         Cell initialPosition = openCells.get(random.nextInt(openCells.size()));
-        this.x = initialPosition.getX();
-        this.y = initialPosition.getY();
         return initialPosition;
     }
 
@@ -65,7 +63,7 @@ public class Bot{
         if ((y < ship.getSize() - 1) && (ship.isOpenCell(x, y + 1))){
             neighbors.add(new Cell(x, y + 1));
         }
-        System.out.print("("+ cell.toString() + ") neighbors are ");
+        System.out.print(cell.toString() + " neighbors are ");
         for (Cell neighCell : neighbors) {
             System.out.print("("+ neighCell.toString() + ")");    
         }
