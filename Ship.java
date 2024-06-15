@@ -12,7 +12,7 @@ public class Ship{
     private int size = 5;
     private Cell button = new Cell();
     private Cell bot = new Cell();
-    private double q = 0.3;
+    public double q = 0.9;
 
     // public Ship(String [][] grid, Cell bot, Cell button){
     //     this.grid = grid;
@@ -222,7 +222,7 @@ public class Ship{
 
     // Prints grid including bot, fire, and button
     public void printCompleteGrid() {
-        System.out.println("X- 0 1 2 3 4");
+        System.out.println("X- 0 1 2 3 4 5 6 7 8 9");
         for (int y = 0; y < grid.length; y++) {
             System.out.print(y + "- ");
             for (int x = 0; x < grid[0].length; x++) {   
@@ -242,29 +242,6 @@ public class Ship{
             System.out.println();
         }
     }
-
-    // Prints grid including bot, fire, and button
-    // public void printCompleteGrid(Cell bot, Fire fire) {
-    //     System.out.println("X- 0 1 2 3 4");
-    //     for (int y = 0; y < grid.length; y++) {
-    //         System.out.print(y + "- ");
-    //         for (int x = 0; x < grid[0].length; x++) {   
-    //             if (bot.getX() == x && bot.getY() == y) {
-    //                 System.out.print("B ");
-    //             }
-    //             else if(isBurning(x,y)){
-    //                 System.out.print("F ");
-    //             }
-    //             else if((button.getX() == x) && (button.getY() == y)){
-    //                 System.out.print("s ");
-    //             }
-    //             else {
-    //                 System.out.print(grid[x][y].equals("open") ? ". " : "x ");
-    //             }
-    //         }
-    //         System.out.println();
-    //     }
-    // }
 
     // Checks if cell is open -- returns boolean
     public boolean isOpenCell(int x, int y){
@@ -305,34 +282,22 @@ public class Ship{
         return grid[x][y];
     }
 
-    public void setCellOnFire(Cell cell){
-        while(true){
-            int x = random.nextInt(getSize()-1);
-            int y = random.nextInt(getSize()-1);
-            if(isOpenCell(x,y) && (x != button.getX() && y != button.getY()) && (cell.getX() != x) && (cell.getY() != y)){
-                grid[x][y] = "burning";
-                System.out.println("Starting Fire Cell: "+ x + ", " + y);
-                break;
-            }
-        }
-    }
-
     // Returns a List of all openNeighbors given a position in the grid
     public List<Cell> getOpenNeighbors(Cell cell){
         List<Cell> openNeighbors = new ArrayList<>();
         int x = cell.getX();
         int y = cell.getY();
 
-        if(isOpenCell(x-1,y)){
+        if(x > 0 && isOpenCell(x-1,y)){
             openNeighbors.add(new Cell(x-1,y));
         }
-        if(isOpenCell(x+1,y)){
+        if(x < getSize()-1 && isOpenCell(x+1,y)){
             openNeighbors.add(new Cell(x+1,y));
         }
-        if(isOpenCell(x,y-1)){
+        if(y > 0 && isOpenCell(x,y-1)){
             openNeighbors.add(new Cell(x,y-1));
         }
-        if(isOpenCell(x,y+1)){
+        if(y < getSize()-1 && isOpenCell(x,y+1)){
             openNeighbors.add(new Cell(x,y+1));
         }
 
@@ -380,4 +345,77 @@ public class Ship{
         return currentlyBurningNeighbors;
     }
 
+    public void setFirstCellOnFire(Cell cell){
+        while(true){
+            int x = random.nextInt(getSize()-1);
+            int y = random.nextInt(getSize()-1);
+            if(isOpenCell(x,y) && (x != button.getX() && y != button.getY()) && (cell.getX() != x) && (cell.getY() != y)){
+                grid[x][y] = "burning";
+                System.out.println("Starting Fire Cell: "+ x + ", " + y);
+                break;
+            }
+        }
+    }
+
+    public void spreadFire(){
+        for (Cell cell : getBurningCells()){
+            for (Cell neighbor : getOpenNeighbors(cell)){
+                double probability = Math.random();
+                int K = getCurrentlyBurningNeighbors(neighbor).size();
+
+                if(probability < (1 - (Math.pow(1 - q, K)))){
+                    setBurning(neighbor);
+                }
+            }
+        }
+    }
+
+    public void setBurning(Cell cell){
+        while(true){
+            if(isOpenCell(cell.getX(), cell.getY())){
+                grid[cell.getX()][cell.getY()] = "burning";
+                break;
+            }
+            else {
+                return;
+            }
+        }
+    }
+
+    public List<Cell> getBurningAndNeighbors(){
+        List<Cell> burningCellsAndNeighbors = new ArrayList<>();
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                if(isBurning(x,y)){
+                    burningCellsAndNeighbors.add(new Cell(x,y)); 
+                    // Add neighbors 
+                    if(x < getSize()-1){
+                        burningCellsAndNeighbors.add(new Cell(x+1, y));
+                    }
+                    if(x > 0){
+                        burningCellsAndNeighbors.add(new Cell(x-1, y));
+                    }
+                    if(y < getSize()-1){
+                        burningCellsAndNeighbors.add(new Cell(x, y+1));
+                    }
+                    if(y > 0){
+                        burningCellsAndNeighbors.add(new Cell(x, y-1));
+                    }   
+                }
+            }
+        }
+        return burningCellsAndNeighbors;
+    }
+
+    public boolean isBurningOrAdj(int x, int y){
+        boolean cellFound = false;
+        for(Cell cell : getBurningAndNeighbors()){
+            if(cell.getX() == x && cell.getY() == y){
+                cellFound = true;
+                break;
+            }
+        }
+        return cellFound;
+    }
 }
