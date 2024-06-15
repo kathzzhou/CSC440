@@ -1,39 +1,49 @@
-
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Collections;
-import java.lang.Math;
 
 public class Ship{
 
     // Initialize variables
     private static final Random random = new Random();
-    private final String[][] grid;
-    private final int size;
-    private Cell button;
+    private String[][] grid;
+    private int size = 5;
+    private Cell button = new Cell();
+    private Cell bot = new Cell();
+    private double q = 0.3;
+
+    // public Ship(String [][] grid, Cell bot, Cell button){
+    //     this.grid = grid;
+    //     this.bot = bot;
+    //     this.button = button;
+    // }
 
     public Ship(int size){
         this.size = size;
         this.grid = new String[size][size];
+        // Create a D x D grid of blocked cells
         createGrid();
+        // Setup Open and Blocked cells per instructions
         startShip();
+        // Setup location for button
         button = createButton();
     }
 
     public Cell createButton(){
         // Initialize Button
-        Cell button = null;
         while(true){
             int x = random.nextInt(getSize() - 1);
             int y = random.nextInt(getSize() - 1);
 
             if(isOpenCell(x,y) && (!isBurning(x,y))){
-                button = new Cell(x,y);
+                this.button.setX(x);
+                this.button.setY(y);
                 break;
             }
         }
+        System.out.println("button random location is " + button.toString());
         return button;
     }
 
@@ -42,7 +52,24 @@ public class Ship{
         return button;
     }
 
-    // Creating a D x D grid of blocked cells
+    // Button Setter
+    public void setButton(int x, int y) {
+        this.button.setX(x);
+        this.button.setY(y);
+    }
+
+    // Bot Getter
+    public Cell getBot(){
+        return bot;
+    }
+
+    // Bot Setter
+    public void setBot(int x, int y) {
+        this.bot.setX(x);
+        this.bot.setY(y);
+    }
+
+    // Create a D x D grid of blocked cells 
     private void createGrid(){
         for(int i = 0; i < size; i++){
             for(int j = 0; j < size; j++){
@@ -51,23 +78,36 @@ public class Ship{
         }
     }
 
+    private void createFixedGrid(){
+        String [][] fixedGrid = {
+            {"blocked", "open", "open", "blocked", "open"},
+            {"blocked", "open", "blocked", "open", "open"},
+            {"blocked", "open", "open", "open", "blocked"},
+            {"open", "blocked", "blocked", "open", "open"},
+            {"open", "open", "open", "open", "blocked"}
+        };
+    }
+
+
+
     // Retrieving neighbors of cell as adjacent cells in up/down/left/right direction
     public List<Cell> getNeighbors(Cell cell){
         List<Cell> neighbors = new ArrayList<>();
         int x = cell.getX();
         int y = cell.getY();
 
-        if(x > 0){
-            neighbors.add(new Cell(x-1,y));
-        }
-        if(x < size-1){
-            neighbors.add(new Cell(x+1,y));
-        }
+        //Neighbors in order
         if(y > 0){
             neighbors.add(new Cell(x,y-1));
         }
         if(y < size-1){
             neighbors.add(new Cell(x, y+1));
+        }
+        if(x > 0){
+            neighbors.add(new Cell(x-1,y));
+        }
+        if(x < size-1){
+            neighbors.add(new Cell(x+1,y));
         }
         return neighbors;
     }
@@ -140,15 +180,15 @@ public class Ship{
     }
 
     /*
-     * Generates Environment:
+     * Generates Environment: 
      *    - Creates D x D Grid
      *    - Opens Random Interior Cell in the Grid
-     *    - Iteratively:
+     *    - Iteratively: 
      *      - blockedCells: All currently blocked cells that have exactly one neighbor
      *      - Pick one at random
      *      - Open selected cell
      *      - Repeats until blockedCells.isEmpty
-     *    - Identify all cells that are dead ends
+     *    - Identify all cells that are dead ends 
      *    - From approx. half of set, open one of their closed neighbors at random
      */
     public void startShip(){
@@ -170,7 +210,7 @@ public class Ship{
                 blockedCells.addAll(newBlockedCells);
             }
         }
-
+        
         // Takes half of set of dead ends and opens one of closed neighbors at random
         List<Cell> deadEnds = identifyDeadEnds();
         Collections.shuffle(deadEnds);
@@ -181,11 +221,11 @@ public class Ship{
     }
 
     // Prints grid including bot, fire, and button
-    public void printCompleteGrid(Cell bot, Fire fire) {
-        System.out.println("X- 0 1 2 3 4 5 6");
+    public void printCompleteGrid() {
+        System.out.println("X- 0 1 2 3 4");
         for (int y = 0; y < grid.length; y++) {
             System.out.print(y + "- ");
-            for (int x = 0; x < grid[0].length; x++) {
+            for (int x = 0; x < grid[0].length; x++) {   
                 if (bot.getX() == x && bot.getY() == y) {
                     System.out.print("B ");
                 }
@@ -196,12 +236,35 @@ public class Ship{
                     System.out.print("s ");
                 }
                 else {
-                    System.out.print(grid[x][y].equals("open") ? "O " : "X ");
+                    System.out.print(grid[x][y].equals("open") ? ". " : "x ");
                 }
             }
             System.out.println();
         }
     }
+
+    // Prints grid including bot, fire, and button
+    // public void printCompleteGrid(Cell bot, Fire fire) {
+    //     System.out.println("X- 0 1 2 3 4");
+    //     for (int y = 0; y < grid.length; y++) {
+    //         System.out.print(y + "- ");
+    //         for (int x = 0; x < grid[0].length; x++) {   
+    //             if (bot.getX() == x && bot.getY() == y) {
+    //                 System.out.print("B ");
+    //             }
+    //             else if(isBurning(x,y)){
+    //                 System.out.print("F ");
+    //             }
+    //             else if((button.getX() == x) && (button.getY() == y)){
+    //                 System.out.print("s ");
+    //             }
+    //             else {
+    //                 System.out.print(grid[x][y].equals("open") ? ". " : "x ");
+    //             }
+    //         }
+    //         System.out.println();
+    //     }
+    // }
 
     // Checks if cell is open -- returns boolean
     public boolean isOpenCell(int x, int y){
@@ -238,11 +301,15 @@ public class Ship{
         return grid;
     }
 
-    public void setCellOnFire(){
+    public String getGridCellString(int x, int y) {
+        return grid[x][y];
+    }
+
+    public void setCellOnFire(Cell cell){
         while(true){
             int x = random.nextInt(getSize()-1);
             int y = random.nextInt(getSize()-1);
-            if(isOpenCell(x,y)){
+            if(isOpenCell(x,y) && (x != button.getX() && y != button.getY()) && (cell.getX() != x) && (cell.getY() != y)){
                 grid[x][y] = "burning";
                 System.out.println("Starting Fire Cell: "+ x + ", " + y);
                 break;
@@ -280,10 +347,10 @@ public class Ship{
     public int numOfBurningCells(Cell cell){
         int x = cell.getX();
         int y = cell.getY();
-
+        
         int burningCount = 0;
-        if(isBurning(x-1,y) || isBurning(x+1,y) ||
-                isBurning(x,y-1) || isBurning(x,y+1)){
+        if(isBurning(x-1,y) || isBurning(x+1,y) || 
+            isBurning(x,y-1) || isBurning(x,y+1)){
             burningCount++;
         }
         return burningCount;
@@ -302,10 +369,15 @@ public class Ship{
         return burningCells;
     }
 
-    public double getP(Cell cell, double q){
-        int K = getOpenNeighbors(cell).size();
-        double P = 1 - Math.pow((1-q), K);
-        return P;
+    public List<Cell> getCurrentlyBurningNeighbors(Cell cell){
+        List<Cell> currentlyBurningNeighbors = new ArrayList<>();
+        List<Cell> allNeighbors = getNeighbors(cell);
+        for(Cell neighbor : allNeighbors){
+            if(isBurning(neighbor.getX(), neighbor.getY())){
+                currentlyBurningNeighbors.add(neighbor);
+            }
+        }
+        return currentlyBurningNeighbors;
     }
 
 }
