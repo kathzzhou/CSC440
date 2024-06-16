@@ -1,3 +1,29 @@
+/*
+ * HOW TO RUN CODE: 
+ * 
+ * On Line __ of Main.java, you can change the D value, manipulating 
+ * the grid size to whatever you'd like. 
+ * 
+ * In Ship.java, on line 15, you can change the value of q, which
+ * represents flammability. 
+ * 
+ * To run the program using different bots, run the program and enter
+ * only the number of the bot you'd like to run. 
+ * 
+ * Following that, the program will show each timestep of the iteration, 
+ * printing the grid at each move. It will depict "B" as the bot, "s" as
+ * the button, and "F" as the fire cells. 
+ * 
+ * Each timestep will show the bot moving along the shortestPath and the
+ * fire spreading to the adjacent cells according to the given 
+ * guidelines.
+ * 
+ * After each run, if you'd like to run different bots, just start the program 
+ * over again. 
+ * 
+ */
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +50,6 @@ public class Main {
                 Cell botLocation = bot_1.placeBot();
                 ship.setFirstCellOnFire(botLocation);
                 ship.setBot(botLocation.getX(), botLocation.getY());
-                //ship.printCompleteGrid();
                                         
                 while(true){
                     System.out.println("======================================================");
