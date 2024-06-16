@@ -1,80 +1,83 @@
-import java.util.*;
-import java.lang.Math;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 public class Bot_4 extends Bot{
-
-    private List<int[]> path;
-    private int pathIndex;
 
     public Bot_4(Ship ship){
         super(ship);
     }
 
-    public double q;
+    public List<Cell> breadthFirstSearch(Ship ship){
 
-    public List<Cell> breadthFirstSearch(Cell bot, Cell button, Fire fire){
-        int row = ship.getSize();
-        int col = ship.getSize();
-
-        PriorityQueue <Cell> queue = new PriorityQueue<>();
-        Queue <Cell> visited = new LinkedList<>();
-        Map <Cell, Cell> parent = new HashMap<>(); // Stores child, parent
-        Map <Cell, Integer> dist = new HashMap<>(); // Stores distance from node to goal node
+        Cell bot = new Cell(ship.getBot().getX(), ship.getBot().getY());
+        Cell button = new Cell(ship.getButton().getX(), ship.getButton().getY());
+        Queue <Cell> queue = new LinkedList<>();
+        boolean visited[][] = new boolean[ship.getSize()][ship.getSize()];
+        Cell[][] parent = new Cell[ship.getSize()][ship.getSize()];
+        Cell[][] cells = new Cell[ship.getSize()][ship.getSize()];
+        for (int i = 0; i < ship.getSize(); i++) {
+            for (int j = 0; j < ship.getSize(); j++) {
+                if (ship.isOpenCell(i,j)) {
+                    cells[i][j] = new Cell(i, j, Integer.MAX_VALUE, null);
+                }
+                visited[i][j] = false;
+            }
+        }
 
         //Starting Node
-        queue.add(bot);
-        visited.add(bot);
-        parent.put(bot,null);
-        dist.put(bot, 0); // dist[start] = 0 from pseudocode
+        queue.add(cells[bot.getX()][bot.getY()]);
+        visited[bot.getX()][bot.getY()] = true;
+        parent[bot.getX()][bot.getY()] = null;
+        Cell current = null;
+        Cell previous = null;
 
         while(!queue.isEmpty()){
 
             // Assign current node & Moves to next cell in queue
-            Cell current = queue.poll();
-            System.out.println("Current: " + current.toString());
+            previous = current;
+            current = queue.poll();
 
             // Check if bot = button
             if(current.equals(button)){
                 List<Cell> path = new ArrayList<>();
-                Cell node = button;
-                while(node != null){
-                    path.add(node);
-                    System.out.println("CurrentNODE: " + node);
-                    node = parent.get(node);
+                Cell node = current;
+                if (node.getParentCell() == null || node == null) {
+                    System.out.println("No path exists between bot and button.");
+                    return null;
                 }
-
-                // for(Cell currentNode = button; currentNode != null; currentNode = parent.get(currentNode)){
-                //     System.out.println("currentNode: " + current.toString());
-                //     System.out.println("currentNode: " + parent.get(currentNode).toString());
-                //     path.add(currentNode);
-                // }  
-
-                Collections.reverse(path);
-                return path;
+                else {
+                    while(node.getParentCell() != null){
+                        path.add(node);
+                        node = node.getParentCell();
+                    }
+                    Collections.reverse(path);
+                    return path;
+                }
             }
-
             //Add children of bot to queue
             else{
                 for(Cell neighbor : getBotNeighbors(current)){
-                    //System.out.println(neighbor);
-                    if((!(ship.isBurning(neighbor.getX(),neighbor.getY()))) &&
-                            (neighbor.isOpenCell(ship)) && (ship.getP(neighbor, q) < .70)){  // for every valid child. including the P probability hard boundary:
-                        // calculate cost between current and the child
-                        // ?????????? im confused on how to calculate this cost
-                        
-                        // calculate heuristic h(child) for the child using manhattan distance
-                        int hDist = Math.abs(neighbor.getX() - button.getX()) + Math.abs(neighbor.getY() - button.getY());
-                        Integer estTotalDist = dist.get(current) + hDist; // + cost(current, child) 
-
-
-                        queue.add(neighbor);
-                        visited.add(neighbor);
-                        System.out.println("parent: " + current.toString() + " " + neighbor.toString());
-                        parent.put(current, neighbor);
+                    if((!(ship.isBurningOrWillBurn(neighbor.getX(),neighbor.getY()))) &&
+                            (neighbor.isOpenCell(ship)) &&
+                            (visited[neighbor.getX()][neighbor.getY()] == false)){
+                        int dist = current.getDist() + 1;
+                        if (dist < neighbor.getDist()) {
+                            visited[neighbor.getX()][neighbor.getY()] = true;
+                            cells[neighbor.getX()][neighbor.getY()].setDist(dist);
+                            cells[neighbor.getX()][neighbor.getY()].setParentCell(cells[current.getX()][current.getY()]);
+                            queue.add(cells[neighbor.getX()][neighbor.getY()]);
+                        }
                     }
                 }
             }
         }
+        System.out.println("No path exists between bot and button.");
         return new ArrayList<>();
     }
 
