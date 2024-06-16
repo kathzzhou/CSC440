@@ -1,3 +1,4 @@
+
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class Ship{
         this.bot.setY(y);
     }
 
-    // Create a D x D grid of blocked cells 
+    // Create a D x D grid of blocked cells
     private void createGrid(){
         for(int i = 0; i < size; i++){
             for(int j = 0; j < size; j++){
@@ -80,11 +81,11 @@ public class Ship{
 
     private void createFixedGrid(){
         String [][] fixedGrid = {
-            {"blocked", "open", "open", "blocked", "open"},
-            {"blocked", "open", "blocked", "open", "open"},
-            {"blocked", "open", "open", "open", "blocked"},
-            {"open", "blocked", "blocked", "open", "open"},
-            {"open", "open", "open", "open", "blocked"}
+                {"blocked", "open", "open", "blocked", "open"},
+                {"blocked", "open", "blocked", "open", "open"},
+                {"blocked", "open", "open", "open", "blocked"},
+                {"open", "blocked", "blocked", "open", "open"},
+                {"open", "open", "open", "open", "blocked"}
         };
     }
 
@@ -180,15 +181,15 @@ public class Ship{
     }
 
     /*
-     * Generates Environment: 
+     * Generates Environment:
      *    - Creates D x D Grid
      *    - Opens Random Interior Cell in the Grid
-     *    - Iteratively: 
+     *    - Iteratively:
      *      - blockedCells: All currently blocked cells that have exactly one neighbor
      *      - Pick one at random
      *      - Open selected cell
      *      - Repeats until blockedCells.isEmpty
-     *    - Identify all cells that are dead ends 
+     *    - Identify all cells that are dead ends
      *    - From approx. half of set, open one of their closed neighbors at random
      */
     public void startShip(){
@@ -210,7 +211,7 @@ public class Ship{
                 blockedCells.addAll(newBlockedCells);
             }
         }
-        
+
         // Takes half of set of dead ends and opens one of closed neighbors at random
         List<Cell> deadEnds = identifyDeadEnds();
         Collections.shuffle(deadEnds);
@@ -225,7 +226,7 @@ public class Ship{
         System.out.println("X- 0 1 2 3 4 5 6 7 8 9");
         for (int y = 0; y < grid.length; y++) {
             System.out.print(y + "- ");
-            for (int x = 0; x < grid[0].length; x++) {   
+            for (int x = 0; x < grid[0].length; x++) {
                 if (bot.getX() == x && bot.getY() == y) {
                     System.out.print("B ");
                 }
@@ -312,10 +313,10 @@ public class Ship{
     public int numOfBurningCells(Cell cell){
         int x = cell.getX();
         int y = cell.getY();
-        
+
         int burningCount = 0;
-        if(isBurning(x-1,y) || isBurning(x+1,y) || 
-            isBurning(x,y-1) || isBurning(x,y+1)){
+        if(isBurning(x-1,y) || isBurning(x+1,y) ||
+                isBurning(x,y-1) || isBurning(x,y+1)){
             burningCount++;
         }
         return burningCount;
@@ -388,8 +389,8 @@ public class Ship{
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
                 if(isBurning(x,y)){
-                    burningCellsAndNeighbors.add(new Cell(x,y)); 
-                    // Add neighbors 
+                    burningCellsAndNeighbors.add(new Cell(x,y));
+                    // Add neighbors
                     if(x < getSize()-1){
                         burningCellsAndNeighbors.add(new Cell(x+1, y));
                     }
@@ -401,7 +402,7 @@ public class Ship{
                     }
                     if(y > 0){
                         burningCellsAndNeighbors.add(new Cell(x, y-1));
-                    }   
+                    }
                 }
             }
         }
@@ -418,4 +419,22 @@ public class Ship{
         }
         return cellFound;
     }
+
+    public boolean isBurningOrWillBurn(int x, int y){
+        boolean cellFound = false;
+        for(Cell cell : getBurningAndNeighbors()){
+            if((cell.getX() == x && cell.getY() == y) && (1-Math.pow((1-q), getOpenNeighbors(cell).size())) > .6 ){
+                cellFound = true;
+                break;
+            }
+        }
+        return cellFound;
+    }
+
+    public double getP(Cell cell, double q){
+        int K = getOpenNeighbors(cell).size();
+        double P = 1 - Math.pow((1-q), K);
+        return P;
+    }
+
 }
