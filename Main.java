@@ -11,10 +11,10 @@ public class Main {
     Scanner myObj = new Scanner(System.in);
 
     public static void main(String[] args) {
-        int D = 10; 
-        String menuOption = "2";
+        int D = 30; 
+        String menuOption;
         
-        //menuOption = printMenu();
+        menuOption = printMenu();
 
         while(true){
             if(menuOption.equals("1")){ // Bot 1
@@ -64,7 +64,6 @@ public class Main {
                 break;
             }
             
-
             if(menuOption.equals("2")){ //Bot 2
                 Ship ship = new Ship(D);
                 Bot_2 bot_2 = new Bot_2(ship);
@@ -161,29 +160,65 @@ public class Main {
                 break;
             }
 
-            // if(menuOption.equals(String.valueOf(4))){
-            //     Ship ship = new Ship(D);
-            //     Bot_4 bot_4 = new Bot_4(ship);
-            //     Bot bot = new Bot(ship);
-            //     Fire fire = new Fire(ship);
-            //     Cell botCell = bot.placeBot();
-            //     ship.printCompleteGrid(botCell, fire);
+            if(menuOption.equals("4")){
+                Ship ship = new Ship(D);
+                Bot_4 bot_4 = new Bot_4(ship);
+                Cell botLocation = bot_4.placeBot();
+                ship.setFirstCellOnFire(botLocation);
+                ship.setBot(botLocation.getX(), botLocation.getY());
 
-            //     bot_4.aStarSearch(ship, botCell, ship.getButton());
-            // }
-            //menuOption = printMenu();
+                while((!ship.isBurning(botLocation.getX(), botLocation.getY()))){
+                    System.out.println("======================================================");
+                    
+                    System.out.println("Bot Location: " + botLocation.toString());
+                    ship.setBot(botLocation.getX(), botLocation.getY());
+                    ship.printCompleteGrid();
+                    List<Cell> shortestPath = (bot_4.breadthFirstSearch(ship));
+                    if (shortestPath.size() > 0) {
+                        System.out.print("ShortestPath(size:" + shortestPath.size() +  "): ");
+                        for (Cell cell : shortestPath) {
+                            System.out.print(cell.toString() + " -> ");
+                        }
+                        System.out.println();
+
+                        botLocation.setLocation(shortestPath.get(0).getX(), 
+                                                shortestPath.get(0).getY());
+                    }
+                    else if (shortestPath.size() == 0){
+                        System.out.println("There is no path from the bot to the button");
+                        break;                    
+                    }
+                    else {
+                        System.out.println("Bot reached the button (1).");
+                        break;                    
+                    }
+                    if(botLocation.getX() == ship.getButton().getX() && botLocation.getY() == ship.getButton().getY()){
+                        System.out.println("Bot reached the button (2).");
+                        break;
+                    }
+                    else{
+                        ship.spreadFire();
+                    }
+                    // Check if bot is on a cell with Fire
+                    if (ship.isBurning(botLocation.getX(), botLocation.getY())) {
+                        System.out.println("Bot is on the same cell as fire. Program Ends.");
+                        break;      
+                    }
+                }
+                break;
+            }
+            menuOption = printMenu();
         }        
     }
 
     private static String printMenu(){
         String menuOption = null;
         try{
-            System.out.print("Would you like to use Bot 1 or Bot 2? (Enter the #): ");
+            System.out.print("Would you like to use Bot 1, Bot 2, Bot 3, or Bot 4? (Enter only the #): ");
             Scanner myObj = new Scanner(System.in);
             menuOption = myObj.nextLine();
-            //System.out.println("You entered : " + menuOption + " (" + menuOption.length() + ")");
             if(menuOption.length() == 1){
-                if(menuOption.equals("1") || menuOption.equals("2")){
+                if(menuOption.equals("1") || menuOption.equals("2") || menuOption.equals("3") || menuOption.equals("4")){
                     return menuOption;
                 }
                 else {
