@@ -17,6 +17,7 @@ value of q.
 
 3) When bots fail or get trapped by the fire, why do they fail? Was there a better decision they could have made that would have saved them? Why or why not? Support your conclusions.
 
+We noticed that when bots fail, they get too close to the fire to get to the shortest path, but by the time they are close to the spread, it's too late and the fire catches up with them. To get around this, the bot could have sacrificed some timesteps to get to a safer, but more expensive path, as it is better to be succeed with a longer path than to not reach the goal at all. Another instance that we notice the bot is failing in more is when it is generated close to the edge of the grid. When this happens, the bot would therefore stick to and move around the edges more, leading to the fire more easily trapping it in a corner with no escape. The bot could have made a better decision by trying the move closer to the center of the grid, giving itself more escape routes from the fire.
 
 
 4) Speculate on how you might construct the ideal bot. What information would it use, what information would it compute, and how?
