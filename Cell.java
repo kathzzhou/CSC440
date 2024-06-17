@@ -1,8 +1,9 @@
+
 public class Cell {
 
     int x, y, dist;
     Cell parentCell;
-    
+
     public Cell(int x, int y){
         this.x = x;
         this.y = y;
@@ -29,7 +30,7 @@ public class Cell {
 
     public int getX() {
         return this.x;
-	}
+    }
 
     public int getY() {
         return this.y;
@@ -37,9 +38,14 @@ public class Cell {
 
     public void setX(int x) {
         this.x = x;
-	}
+    }
 
     public void setY(int y) {
+        this.y = y;
+    }
+
+    public void setLocation(int x, int y) {
+        this.x = x;
         this.y = y;
     }
 
@@ -49,7 +55,7 @@ public class Cell {
 
     public void setDist(int x) {
         this.dist = x;
-	}
+    }
 
     public Cell getParentCell() {
         return this.parentCell;
@@ -57,12 +63,12 @@ public class Cell {
 
     public void setParentCell(Cell x) {
         this.parentCell = x;
-	}
+    }
 
     public boolean isOpenCell(Ship ship){
         return ship.getGrid()[x][y].equals("open");
     }
-    
+
     @Override
     public String toString(){
         return "Cell: (" + x + ", " + y + ")";
