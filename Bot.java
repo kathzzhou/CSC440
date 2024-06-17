@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -6,7 +7,7 @@ public class Bot{
 
     private static final Random random = new Random();
 
-    private int x; 
+    private int x;
     private int y;
     protected final Ship ship;
 
@@ -53,7 +54,7 @@ public class Bot{
 
         if ((x > 0) && (ship.isOpenCell(x - 1, y))){
             neighbors.add(new Cell(x - 1, y));
-        } 
+        }
         if ((x < ship.getSize() - 1) && (ship.isOpenCell(x + 1, y))){
             neighbors.add(new Cell(x + 1, y));
         }
@@ -65,7 +66,7 @@ public class Bot{
         }
         System.out.print(cell.toString() + " neighbors are ");
         for (Cell neighCell : neighbors) {
-            System.out.print("("+ neighCell.toString() + ")");    
+            System.out.print("("+ neighCell.toString() + ")");
         }
         System.out.println();
         return neighbors;
