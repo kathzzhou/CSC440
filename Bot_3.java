@@ -21,14 +21,14 @@ public class Bot_3 extends Bot{
         Cell[][] parent = new Cell[ship.getSize()][ship.getSize()];
         Cell[][] cells = new Cell[ship.getSize()][ship.getSize()];
         for (int i = 0; i < ship.getSize(); i++) {
-	        for (int j = 0; j < ship.getSize(); j++) {
-	            if (ship.isOpenCell(i,j)) {
-	                cells[i][j] = new Cell(i, j, Integer.MAX_VALUE, null);
-	            }
+            for (int j = 0; j < ship.getSize(); j++) {
+                if (ship.isOpenCell(i,j)) {
+                    cells[i][j] = new Cell(i, j, Integer.MAX_VALUE, null);
+                }
                 visited[i][j] = false;
-	        }
-	    }
-      
+            }
+        }
+
         //Starting Node
         queue.add(cells[bot.getX()][bot.getY()]);
         visited[bot.getX()][bot.getY()] = true;
@@ -36,7 +36,7 @@ public class Bot_3 extends Bot{
         Cell current = null;
         Cell previous = null;
 
-        while(!queue.isEmpty()){        
+        while(!queue.isEmpty()){
 
             // Assign current node & Moves to next cell in queue
             previous = current;
@@ -61,9 +61,9 @@ public class Bot_3 extends Bot{
             //Add children of bot to queue
             else{
                 for(Cell neighbor : getBotNeighbors(current)){
-                    if((!(ship.isBurningOrAdj(neighbor.getX(),neighbor.getY()))) && 
-                        (neighbor.isOpenCell(ship)) && 
-                        visited[neighbor.getX()][neighbor.getY()] == false){
+                    if((!(ship.isBurningOrAdj(neighbor.getX(),neighbor.getY()))) &&
+                            (neighbor.isOpenCell(ship)) &&
+                            visited[neighbor.getX()][neighbor.getY()] == false){
                         int dist = current.getDist() + 1;
                         if (dist < neighbor.getDist()) {
                             visited[neighbor.getX()][neighbor.getY()] = true;
@@ -87,14 +87,14 @@ public class Bot_3 extends Bot{
         Cell[][] parent = new Cell[ship.getSize()][ship.getSize()];
         Cell[][] cells = new Cell[ship.getSize()][ship.getSize()];
         for (int i = 0; i < ship.getSize(); i++) {
-	        for (int j = 0; j < ship.getSize(); j++) {
-	            if (ship.isOpenCell(i,j)) {
-	                cells[i][j] = new Cell(i, j, Integer.MAX_VALUE, null);
-	            }
+            for (int j = 0; j < ship.getSize(); j++) {
+                if (ship.isOpenCell(i,j)) {
+                    cells[i][j] = new Cell(i, j, Integer.MAX_VALUE, null);
+                }
                 visited[i][j] = false;
-	        }
-	    }
-      
+            }
+        }
+
         //Starting Node
         queue.add(cells[bot.getX()][bot.getY()]);
         visited[bot.getX()][bot.getY()] = true;
@@ -102,7 +102,7 @@ public class Bot_3 extends Bot{
         Cell current = null;
         Cell previous = null;
 
-        while(!queue.isEmpty()){        
+        while(!queue.isEmpty()){
 
             // Assign current node & Moves to next cell in queue
             previous = current;
@@ -128,9 +128,9 @@ public class Bot_3 extends Bot{
             //Add children of bot to queue
             else{
                 for(Cell neighbor : getBotNeighbors(current)){
-                    if((!(ship.isBurning(neighbor.getX(),neighbor.getY()))) && 
-                        (neighbor.isOpenCell(ship)) && 
-                        visited[neighbor.getX()][neighbor.getY()] == false){
+                    if((!(ship.isBurning(neighbor.getX(),neighbor.getY()))) &&
+                            (neighbor.isOpenCell(ship)) &&
+                            visited[neighbor.getX()][neighbor.getY()] == false){
                         int dist = current.getDist() + 1;
                         if (dist < neighbor.getDist()) {
                             visited[neighbor.getX()][neighbor.getY()] = true;
